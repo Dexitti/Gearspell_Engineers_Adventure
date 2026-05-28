@@ -267,15 +267,17 @@
           "text": "Спуститься в один из котлованов",
           "effects": {
             "playerEnergy": -5,
-            "nextId": 9
-          }
+            "nextId": 9,
+            "addItem": "Осколки кристаллов"
+            }
         },
         {
           "text": "Набрать стружки на берегу",
           "effects": {
             "playerEnergy": -5,
             "playerHealth": -7,
-            "nextId": 9
+            "nextId": 9,
+            "addItem": "Кристальная стружка"
           }
         },
         {
@@ -296,7 +298,9 @@
           "effects": {
             "playerEnergy": 30,
             "towerHealth": 20,
-            "nextId": 100
+            "requireItem": "Осколки кристаллов",
+            "nextId": 100,
+            "altNextId": 100
           }
         },
         {
@@ -365,6 +369,7 @@
           "effects": {
             "playerEnergy": 20,
             "towerHealth": 15,
+            "addItem": "Страж",
             "nextId": 100
           }
         }

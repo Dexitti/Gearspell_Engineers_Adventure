@@ -5,10 +5,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private LinearLayout menuContainer;
@@ -39,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
         stageStatus = findViewById(R.id.stageStatus);
         choicesContainer = findViewById(R.id.choicesContainer);
 
+        // Устанавливаем фон
+        menuBackground.setImageResource(R.drawable.bg_td_fight);
+        menuBackground.setVisibility(View.VISIBLE);
+
         findViewById(R.id.startButton).setOnClickListener(v -> startGame());
 
         Button inventoryBtn = findViewById(R.id.inventoryButton);
@@ -62,16 +70,24 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        StringBuilder itemsText = new StringBuilder();
-        for (InventoryItem item : game.getInventory().getItems()) {
-            itemsText.append("• ").append(item.getName())
-                    .append("\n  ").append(item.getDescription())
-                    .append("\n\n");
+        ScrollView scrollView = new ScrollView(this);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(16, 16, 16, 16);
+
+        for (String item : game.getInventory().getItems()) {
+            TextView itemView = new TextView(this);
+            itemView.setText("• " + item);
+            itemView.setTextSize(16);
+            itemView.setPadding(8, 8, 8, 8);
+            layout.addView(itemView);
         }
 
+        scrollView.addView(layout);
+
         new AlertDialog.Builder(this)
-                .setTitle("📦 Инвентарь (" + game.getInventory().getSize() + "/5)")
-                .setMessage(itemsText.toString())
+                .setTitle("📦 Инвентарь (" + game.getInventory().getSize() + ")")
+                .setView(scrollView)
                 .setPositiveButton("Закрыть", null)
                 .show();
     }
@@ -84,14 +100,7 @@ public class MainActivity extends AppCompatActivity {
         String story = game.getCurrentEvent().getText();
         storyText.setText(story);
 
-        // Фон
-        int bgResId = getBackgroundForEvent(game.getCurrentEventId());
-        if (bgResId != 0) {
-            storyBackground.setImageResource(bgResId);
-            storyBackground.setVisibility(View.VISIBLE);
-        } else {
-            storyBackground.setVisibility(View.GONE);
-        }
+        // Можно добавить фон
 
         // Статус
         towerStatus.setText("🏰: " + game.getTower().getHealth());
@@ -113,34 +122,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private int getBackgroundForEvent(int eventId) {
-        // Здесь можно задать фоны для конкретных eventId
-        // Например: if (eventId == 8) return R.drawable.crystal_beach;
-        return 0; // 0 - нет фона
-    }
-
     private void addChoiceButtons() {
         for (int i = 0; i < game.getCurrentEvent().getChoices().size(); i++) {
             Button btn = new Button(this);
-            btn.setText(game.getCurrentEvent().getChoices().get(i).getText());
+            String choiceText = game.getCurrentEvent().getChoices().get(i).getText();
+            btn.setText(choiceText);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            btn.setLayoutParams(params);
-
-            // Проверяем, использован ли выбор
+            String requiredItem = getRequiredItemForChoice(game.getCurrentEventId(), i);
+            boolean hasRequiredItem = requiredItem != null && game.getInventory().hasItem(requiredItem);
             boolean isUsed = game.isChoiceUsed(i);
 
             if (isUsed) {
                 // Заблокированная (серая) кнопка
                 btn.setEnabled(false);
                 btn.setAlpha(0.5f);
+            } else if (requiredItem != null && !hasRequiredItem) {
+                // Если требуемый предмет отсутствует — блокируем кнопку
+                btn.setEnabled(false);
+                btn.setAlpha(0.3f);
+                btn.setText(choiceText + " (" + requiredItem + ")");
             } else {
                 // Активная кнопка
                 btn.setEnabled(true);
                 btn.setAlpha(1f);
-
                 int choice = i;
                 btn.setOnClickListener(v -> {
                     game.makeChoice(choice);
@@ -150,6 +154,22 @@ public class MainActivity extends AppCompatActivity {
 
             choicesContainer.addView(btn);
         }
+    }
+
+    private String getRequiredItemForChoice(int eventId, int choiceIndex) {
+        try {
+            for (int i = 0; i < game.stages.length(); i++) {
+                JSONObject stageObj = game.stages.getJSONObject(i);
+                if (stageObj.getInt("id") == eventId) {
+                    JSONArray choices = stageObj.getJSONArray("choices");
+                    JSONObject choiceObj = choices.getJSONObject(choiceIndex);
+                    if (choiceObj.has("effects") && choiceObj.getJSONObject("effects").has("requireItem")) {
+                        return choiceObj.getJSONObject("effects").getString("requireItem");
+                    }
+                }
+            }
+        } catch (Exception e) {}
+        return null;
     }
 
     private void addRestartButton() {

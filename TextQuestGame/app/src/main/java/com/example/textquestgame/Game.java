@@ -17,7 +17,7 @@ public class Game {
     private boolean gameOver = false;
     private boolean gameWon = false;
     private Context context;
-    private JSONArray stages;
+    JSONArray stages;
 
     // Множество для хранения уже сделанных выборов
     private Set<String> usedChoices = new HashSet<>();
@@ -110,8 +110,8 @@ public class Game {
 
                     // Добавление предметов
                     if (effects.has("addItem")) {
-                        JSONObject addItem = effects.getJSONObject("addItem");
-                        inventory.addItem(addItem.getString("name"), addItem.getString("desc"));
+                        String itemName = effects.getString("addItem");
+                        inventory.addItem(itemName);
                     }
 
                     // Удаление предметов
