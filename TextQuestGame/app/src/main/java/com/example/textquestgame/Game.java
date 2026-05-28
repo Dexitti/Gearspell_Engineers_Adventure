@@ -10,6 +10,7 @@ import java.util.Set;
 public class Game {
     private Tower tower;
     private Player player;
+    private Inventory inventory;
     private int currentEventId = 1;
     private Event currentEvent;
     private int stage = 1;
@@ -24,6 +25,7 @@ public class Game {
     public Game(String playerName, Context context) {
         this.tower = new Tower();
         this.player = new Player(playerName);
+        this.inventory = new Inventory();
         this.context = context;
         loadStages();
         this.currentEvent = getEventById(1);
@@ -106,6 +108,27 @@ public class Game {
                         player.heal(playerHealthChange);
                     }
 
+                    // Добавление предметов
+                    if (effects.has("addItem")) {
+                        JSONObject addItem = effects.getJSONObject("addItem");
+                        inventory.addItem(addItem.getString("name"), addItem.getString("desc"));
+                    }
+
+                    // Удаление предметов
+                    if (effects.has("removeItem")) {
+                        inventory.removeItem(effects.getString("removeItem"));
+                    }
+
+                    // Переход на следующий ID события (с проверкой альт. перехода)
+                    int nextId = effects.getInt("nextId");
+                    if (effects.has("requireItem") && effects.has("altNextId")) {
+                        String requiredItem = effects.getString("requireItem");
+                        int altNextId = effects.getInt("altNextId");
+                        if (inventory.hasItem(requiredItem)) {
+                            nextId = altNextId;
+                        }
+                    }
+
                     // Проверяем условия победы/поражения
                     if (effects.has("winCondition")) {
                         JSONObject winCond = effects.getJSONObject("winCondition");
@@ -115,8 +138,6 @@ public class Game {
                         else if (type.equals("lose")) gameOver = true;
 
                     } else {
-                        // Переход на следующий ID события
-                        int nextId = effects.getInt("nextId");
                         if (nextId != -1) {
                             currentEventId = nextId;
                             stage++;
@@ -131,20 +152,13 @@ public class Game {
         }
 
         // Проверка на смерть
-        if (tower.getHealth() <= 0 || player.getHealth() <= 0) {
-            gameOver = true;
-        }
-
-        if (player.getEnergy() < 0) {
-            player.addEnergy(0);
-        }
+        if (tower.getHealth() <= 0 || player.getHealth() <= 0) gameOver = true;
+        if (player.getEnergy() < 0) player.addEnergy(0);
 
         // Получаем следующее событие если игра не закончена
         if (!gameOver && !gameWon) {
             currentEvent = getEventById(currentEventId);
-            if (currentEvent == null) {
-                gameOver = true;
-            }
+            if (currentEvent == null) gameOver = true;
         }
     }
 
@@ -168,10 +182,12 @@ public class Game {
     }
 
     // Геттеры
-    public Player getPlayer() { return player; }
     public Tower getTower() { return tower; }
+    public Player getPlayer() { return player; }
+    public Inventory getInventory() { return inventory; }
     public boolean isGameOver() { return gameOver; }
     public boolean isGameWon() { return gameWon; }
     public Event getCurrentEvent() { return currentEvent; }
+    public int getCurrentEventId() { return currentEventId; }
     public int getStage() { return stage; }
 }

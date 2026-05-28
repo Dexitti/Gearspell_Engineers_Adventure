@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="#1a1a2e">
 
     <!-- Экран начала -->
@@ -12,24 +11,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
         android:visibility="visible">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:layout_marginBottom="320dp"
-            android:text="⚡ БАШНЯ ИНЖЕНЕРА ⚡"
-            android:textColor="#4ecdc4"
-            android:textSize="24sp" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/startButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#4ecdc4"
-            android:text="Начать игру" />
+            <ImageView
+                android:id="@+id/menuBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
+                    android:layout_marginBottom="320dp"
+                    android:text="⚡ БАШНЯ ИНЖЕНЕРА ⚡"
+                    android:textColor="#4ecdc4"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/startButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#4ecdc4"
+                    android:text="Начать игру" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
     <!-- Игровой экран -->
@@ -38,18 +57,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/storyText"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:textSize="18sp"
-            android:textColor="#ffffff"
-            android:padding="16dp"
-            android:background="#16213e"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:id="@+id/storyBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/storyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="#ffffff"
+                    android:padding="16dp"
+                    android:background="#00000000"/>
+            </ScrollView>
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/statusLayout"
@@ -100,6 +138,17 @@
                 android:textSize="16sp"
                 android:gravity="center"/>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/inventoryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📦 ИНВЕНТАРЬ"
+            android:textColor="#4ecdc4"
+            android:textSize="16sp"
+            android:backgroundTint="#0f3460"
+            android:layout_marginBottom="8dp"
+            android:padding="8dp"/>
 
         <LinearLayout
             android:id="@+id/choicesContainer"

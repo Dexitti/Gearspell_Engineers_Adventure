@@ -3,12 +3,16 @@ package com.example.textquestgame;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     private LinearLayout menuContainer;
+    private ImageView menuBackground;
     private LinearLayout gameContainer;
     private TextView storyText;
     private TextView towerStatus;
@@ -16,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView energyStatus;
     private TextView stageStatus;
     private LinearLayout choicesContainer;
+    private ImageView storyBackground;
     private Game game;
 
     @Override
@@ -24,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         menuContainer = findViewById(R.id.menuContainer);
+        menuBackground = findViewById(R.id.menuBackground);
         gameContainer = findViewById(R.id.gameContainer);
         storyText = findViewById(R.id.storyText);
+        storyBackground = findViewById(R.id.storyBackground);
         towerStatus = findViewById(R.id.towerStatus);
         playerHpStatus = findViewById(R.id.playerHpStatus);
         energyStatus = findViewById(R.id.energyStatus);
@@ -33,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         choicesContainer = findViewById(R.id.choicesContainer);
 
         findViewById(R.id.startButton).setOnClickListener(v -> startGame());
+
+        Button inventoryBtn = findViewById(R.id.inventoryButton);
+        inventoryBtn.setOnClickListener(v -> showInventoryDialog());
     }
 
     private void startGame() {
@@ -42,6 +52,30 @@ public class MainActivity extends AppCompatActivity {
         updateScreen();
     }
 
+    private void showInventoryDialog() {
+        if (game == null || game.getInventory().isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("📦 Инвентарь")
+                    .setMessage("Инвентарь пуст")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        StringBuilder itemsText = new StringBuilder();
+        for (InventoryItem item : game.getInventory().getItems()) {
+            itemsText.append("• ").append(item.getName())
+                    .append("\n  ").append(item.getDescription())
+                    .append("\n\n");
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("📦 Инвентарь (" + game.getInventory().getSize() + "/5)")
+                .setMessage(itemsText.toString())
+                .setPositiveButton("Закрыть", null)
+                .show();
+    }
+
     @SuppressWarnings("SetTextI18n")
     private void updateScreen() {
         if (game == null) return;
@@ -49,6 +83,15 @@ public class MainActivity extends AppCompatActivity {
         // Текст истории
         String story = game.getCurrentEvent().getText();
         storyText.setText(story);
+
+        // Фон
+        int bgResId = getBackgroundForEvent(game.getCurrentEventId());
+        if (bgResId != 0) {
+            storyBackground.setImageResource(bgResId);
+            storyBackground.setVisibility(View.VISIBLE);
+        } else {
+            storyBackground.setVisibility(View.GONE);
+        }
 
         // Статус
         towerStatus.setText("🏰: " + game.getTower().getHealth());
@@ -68,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
         } else {
             addChoiceButtons();
         }
+    }
+
+    private int getBackgroundForEvent(int eventId) {
+        // Здесь можно задать фоны для конкретных eventId
+        // Например: if (eventId == 8) return R.drawable.crystal_beach;
+        return 0; // 0 - нет фона
     }
 
     private void addChoiceButtons() {
