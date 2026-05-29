@@ -16,7 +16,7 @@ Gearspell: Engineer's Adventure – это текстовый квест об и
 И помните: конец истории не означает конец приключения
 
 ## Демонстрация геймплея
-<Видео>
+https://github.com/user-attachments/assets/621cf985-1962-4e47-b7c4-8bde5de828a7
 
 ## 📥 Скачать
 Скачайте APK на своё Android-устройство и играйте!
@@ -24,6 +24,6 @@ Gearspell: Engineer's Adventure – это текстовый квест об и
 [Скачать последнюю версию](https://github.com/Dexitti/Gearspell_Engineers_Adventure/releases/download/v.1.0.2/game.apk)
 
 ## Предыстория
-Игра создана в качестве раскрытия лора другой моей игры [Gearspell Tower](https://github.com/Dexitti/Gearspell-Tower)
+Игра создана в качестве дополнения лора другой моей игры [Gearspell Tower](https://github.com/Dexitti/Gearspell-Tower)
 
 Спасибо за прочтение и что поиграли в мою игру!
