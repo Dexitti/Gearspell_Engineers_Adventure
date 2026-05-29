@@ -110,8 +110,19 @@ public class Game {
 
                     // Добавление предметов
                     if (effects.has("addItem")) {
-                        String itemName = effects.getString("addItem");
-                        inventory.addItem(itemName);
+                        Object addItemObj = effects.get("addItem");
+                        if (addItemObj instanceof JSONArray) {
+                            // Массив предметов
+                            JSONArray items = (JSONArray) addItemObj;
+                            for (int k = 0; k < items.length(); k++) {
+                                String itemName = items.getString(k);
+                                inventory.addItem(itemName);
+                            }
+                        } else if (addItemObj instanceof String) {
+                            // Один предмет
+                            String itemName = effects.getString("addItem");
+                            inventory.addItem(itemName);
+                        }
                     }
 
                     // Удаление предметов
@@ -119,15 +130,8 @@ public class Game {
                         inventory.removeItem(effects.getString("removeItem"));
                     }
 
-                    // Переход на следующий ID события (с проверкой альт. перехода)
+                    // Переход на следующий ID события (с проверкой предмета)
                     int nextId = effects.getInt("nextId");
-                    if (effects.has("requireItem") && effects.has("altNextId")) {
-                        String requiredItem = effects.getString("requireItem");
-                        int altNextId = effects.getInt("altNextId");
-                        if (inventory.hasItem(requiredItem)) {
-                            nextId = altNextId;
-                        }
-                    }
 
                     // Проверяем условия победы/поражения
                     if (effects.has("winCondition")) {

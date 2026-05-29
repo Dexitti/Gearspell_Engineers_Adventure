@@ -9,6 +9,7 @@ public class Inventory {
 
     public boolean addItem(String name) {
         if (items.size() >= MAX_SIZE) return false;
+        if (items.contains(name)) return true;
         items.add(name);
         return true;
     }

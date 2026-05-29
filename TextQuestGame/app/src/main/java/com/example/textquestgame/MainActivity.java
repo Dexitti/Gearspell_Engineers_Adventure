@@ -163,8 +163,22 @@ public class MainActivity extends AppCompatActivity {
                 if (stageObj.getInt("id") == eventId) {
                     JSONArray choices = stageObj.getJSONArray("choices");
                     JSONObject choiceObj = choices.getJSONObject(choiceIndex);
-                    if (choiceObj.has("effects") && choiceObj.getJSONObject("effects").has("requireItem")) {
-                        return choiceObj.getJSONObject("effects").getString("requireItem");
+                    if (choiceObj.has("effects")) {
+                        JSONObject effects = choiceObj.getJSONObject("effects");
+                        if (effects.has("requireItem")) {
+                            Object requireObj = effects.get("requireItem");
+                            if (requireObj instanceof JSONArray) {
+                                JSONArray items = (JSONArray) requireObj;
+                                StringBuilder sb = new StringBuilder();
+                                for (int j = 0; j < items.length(); j++) {
+                                    if (j > 0) sb.append(", ");
+                                    sb.append(items.getString(j));
+                                }
+                                return sb.toString();
+                            } else {
+                                return effects.getString("requireItem");
+                            }
+                        }
                     }
                 }
             }
